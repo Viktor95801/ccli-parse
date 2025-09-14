@@ -81,6 +81,7 @@ typedef struct {
     char **argumentv;
     Cp_Opt *optv;
     const char *app_name;
+    void(*usage)(Cp_Ctx *ctx, FILE *file);
     uintmax_t optc;
     int argc;
     int argumentc;
@@ -97,6 +98,7 @@ bool cp__parseLongOpt(Cp_Ctx *ctx, int *argv_index, Cp_Opt opt);
 int cp_parseUntil(Cp_Ctx *ctx, uintmax_t subcommandc, const char **subcommandv);
 int cp_parse(Cp_Ctx *ctx);
 
+// Very basic `usage` function
 void cp_usage(Cp_Ctx *ctx, FILE *file);
 
 // internal usage
@@ -149,6 +151,8 @@ Cp_Ctx *cp_newCtx(int argc, char *argv[], uintmax_t optc, Cp_Opt optv[], int arg
 
     ctx->argumentcap = argumentcap;
     ctx->argumentv = argumentv;
+
+    ctx->usage = cp_usage;
 
     return ctx;
 }
@@ -435,10 +439,15 @@ int cp_parse(Cp_Ctx *ctx) {
     return cp_parseUntil(ctx, 0, NULL);
 }
 
-//TODO: TODO
 void cp_usage(Cp_Ctx *ctx, FILE *file) {
-    fprintf(file, "Hello, World!\n");
+    fprintf(file, "OPTIONS:\n");
+    for(int i = 0; i < ctx->optc; ++i) {
+        Cp_Opt opt = ctx->optv[i];
+        fprintf(file, "\t%s, %c : %s\n", 
+            opt.name, opt.short_name != 0 ? opt.short_name : '-', opt.desc);
+    }
 }
+
 #endif
 
 #endif
