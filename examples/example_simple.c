@@ -31,14 +31,16 @@ void usage(Cp_Ctx *ctx, FILE *file) {
 
 int main(int argc, char *argv[]) {
     bool help;
+    bool test;
     char *file = NULL;
     char *name = NULL;
-    double num = CP_OPTK_NUMBER_INVALID;
+    double numb = CP_OPTK_NUMBER_INVALID;
     Cp_Opt opts[] = {
         {&help, OPTK_BOOL, "help", 'h', "Prints this help message. Upon doing so, exits the program successfully."},
+        {&test, OPTK_BOOL, "test", 't', "Sick test."},
         {&file, OPTK_STRING, "file", 0, "File to print.", "File which the program will print, whilst not removing its contents. Can be useful as a replacement for `cat`. Upon printing, exits the program successfully."},
         {&name, OPTK_STRING, "name", 'n', "Your name.", "Prints your name to the terminal screen."},
-        {&num, OPTK_NUMBER, "number", 'N', "Number to print."}
+        {&numb, OPTK_NUMBER, "number", 'N', "Number to print."}
     };
     
     char **argumentv = alloca( argc * sizeof(char*));
@@ -53,6 +55,12 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     
+    if(test) {
+        printf("This is a very sick test\n");
+    }
+    if(numb == numb) {
+        printf("Number: %lf\n", numb);
+    }
     if(help) {
         usage(ctx, stdout);
         cp_freeCtx(ctx);
@@ -64,10 +72,6 @@ int main(int argc, char *argv[]) {
     if(file != NULL) {
         printf("File name: %s\n", file);
     }
-    if(num == num) {
-        printf("Number: %lf\n", num);
-    }
-    
     for(int i = 0; i < ctx->argumentc; ++i) {
         printf("Argument[%d] = %s\n", i, ctx->argumentv[i]);
     }

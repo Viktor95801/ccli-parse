@@ -86,6 +86,7 @@ typedef struct Cp_Ctx {
     int argi; // internal index for where we are in argv
     int argumentc;
     int argumentcap;
+    bool dashdash_halt;
 } Cp_Ctx;
 Cp_Ctx *cp_newCtx(int argc, char *argv[], uintmax_t optc, Cp_Opt optv[], int argumentcap, char *argumentv[]);
 void cp_freeCtx(Cp_Ctx *ctx);
@@ -96,7 +97,7 @@ extern char cp_parse_opt_err[CP_PARSE_ERR_LEN];
 bool cp__parseLongOpt(Cp_Ctx *ctx, Cp_Opt opt);
 bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount);
 
-int cp_parseUntil(Cp_Ctx *ctx, uintmax_t subcommandc, const char **subcommandv);
+int cp_parseUntil(Cp_Ctx *ctx, uintmax_t subcommandc, const char *subcommandv[]);
 int cp_parse(Cp_Ctx *ctx);
 
 // internal usage
@@ -141,8 +142,8 @@ Cp_Ctx *cp_newCtx(int argc, char *argv[], uintmax_t optc, Cp_Opt optv[], int arg
         return NULL;
     }
 
-    ctx->argc = --argc;
-    ctx->argv = ++argv;
+    ctx->argc = argc;
+    ctx->argv = argv;
 
     ctx->optc = optc;
     ctx->optv = optv;
@@ -271,7 +272,7 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
             if(arg_amount > 1) {
                 snprintf(
                     cp_parse_opt_err, CP_PARSE_ERR_LEN,
-                    "At argument near %d: Short args can only have an argument if isolated.", ctx->argi
+                    "At argument near %d: Short opts can only have an argument if isolated.", ctx->argi
                 );
                 return false;
             }
@@ -306,7 +307,7 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
             if(arg_amount > 1) {
                 snprintf(
                     cp_parse_opt_err, CP_PARSE_ERR_LEN,
-                    "At argument near %d: Short args can only have an argument if isolated.", ctx->argi
+                    "At argument near %d: Short opts can only have an argument if isolated.", ctx->argi
                 );
                 return -1;
             }
@@ -357,117 +358,16 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
             strncpy(cp_parse_opt_err, "Internal: Unknown option kind.", CP_PARSE_ERR_LEN);
             return false; // in theory, unreachable
         } break;
-    }                    switch(opt.kind) {
-        case OPTK_BOOL: {
-            if(arg_amount < arg_len && (arg[arg_amount] == '=' || arg[arg_amount] == ':')) {
-                snprintf(
-                    cp_parse_opt_err, CP_PARSE_ERR_LEN,
-                    "At argument near %d: Argument of type `bool` takes no argument.", ctx->argi
-                );
-                return false;
-            }
-            *(bool*)(opt.holder) = 1;
-        } break;
-        case OPTK_STRING: {
-            if(arg_amount > 1) {
-                snprintf(
-                    cp_parse_opt_err, CP_PARSE_ERR_LEN,
-                    "At argument near %d: Short args can only have an argument if isolated.", ctx->argi
-                );
-                return false;
-            }
-            if(arg_amount >= arg_len) {
-                // the value is on the next argument
-                if(ctx->argi+1 >= ctx->argc) {
-                    snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
-                        "At argument near %d: Expected argument but got nothing.", ctx->argi
-                    );
-                    return false;
-                }
-                arg = ctx->argv[++ctx->argi];
-                *(char**)(opt.holder) = (char*)arg;
-                return true;
-            }
-            char *assign;
-            if((assign = strchr(arg, '=')) == NULL) {
-                if((assign = strchr(arg, ':')) == NULL) {
-                    snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
-                        "At argument near %d: Expected either '=', ':' or ' ' to set value. E.g. `flag=this flag:that`.", ctx->argi
-                    );
-                    return false;
-                }
-            }
-            ++assign;
-            *(char**)(opt.holder) = assign;
-            return true;
-        } break;
-        case OPTK_NUMBER: {
-            if(arg_amount > 1) {
-                snprintf(
-                    cp_parse_opt_err, CP_PARSE_ERR_LEN,
-                    "At argument near %d: Short args can only have an argument if isolated.", ctx->argi
-                );
-                return false;
-            }
-            if(arg_amount >= arg_len) {
-                // the value is on the next argument
-                if(ctx->argi+1 >= ctx->argc) {
-                    snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
-                        "At argument near %d: Expected argument but got nothing.", ctx->argi
-                    );
-                    return false;
-                }
-                arg = ctx->argv[++ctx->argi];
-                double value;
-                if(sscanf(arg, "%lf", &value) != 1) {
-                    snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
-                        "At argument near %d: Expected a number literal.", ctx->argi
-                    );
-                    return false;
-                }
-                *(double*)(opt.holder) = value;
-                return true;
-            }
-            char *assign;
-            if((assign = strchr(arg, '=')) == NULL) {
-                if((assign = strchr(arg, ':')) == NULL) {
-                    snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
-                        "At argument near %d: Expected either '=', ':' or ' ' to set value. E.g. `flag=this flag:that`.", ctx->argi
-                    );
-                    return false;
-                }
-            }
-            ++assign;
-            double value;
-            if(sscanf(assign, "%lf", &value) != 1) {
-                snprintf(
-                    cp_parse_opt_err, CP_PARSE_ERR_LEN,
-                    "At argument near %d: Expected a number literal.", ctx->argi
-                );
-                return false;
-            }
-            *(double*)(opt.holder) = value;
-            return true;
-        } break;
-        default: {
-            strncpy(cp_parse_opt_err, "Unknown option kind.", CP_PARSE_ERR_LEN);
-            return false; // in theory, unreachable
-        } break;
     }
 
     return true;
 }
 
 // returns where it stopped parsing `ctx->argv`, 0-indexed, or -1 for parsing error
-int cp_parseUntil(Cp_Ctx *ctx, uintmax_t subcommandc, const char **subcommandv) {
+int cp_parseUntil(Cp_Ctx *ctx, uintmax_t subcommandc, const char *subcommandv[]) {
     for(; ctx->argi < ctx->argc; ++ctx->argi) {
         const char *arg = ctx->argv[ctx->argi];
-        if(cp__streq(arg, "--")) {
+        if(ctx->dashdash_halt && cp__streq(arg, "--")) {
             if(ctx->argumentc+1 >= ctx->argumentcap) {
                 return ctx->argi;
             }
@@ -486,24 +386,26 @@ int cp_parseUntil(Cp_Ctx *ctx, uintmax_t subcommandc, const char **subcommandv) 
 
         if(cp__strHasPrefix(arg, "--")) {
             arg+=2;
-            bool match = false;
-            for(size_t j = 0; j < ctx->optc; ++j) {
-                if(cp__strHasPrefix(arg, ctx->optv[j].name)) {
-                    match = true;
-                    if(!cp__parseLongOpt(ctx, ctx->optv[j])) {
-                        return -1;
+            if(strlen(arg) != 0) { 
+                bool match = false;
+                for(size_t j = 0; j < ctx->optc; ++j) {
+                    if(cp__strHasPrefix(arg, ctx->optv[j].name)) {
+                        match = true;
+                        if(!cp__parseLongOpt(ctx, ctx->optv[j])) {
+                            return -1;
+                        }
+                    }
+                    if(match) {
+                        break;
                     }
                 }
-                if(match) {
-                    break;
+                if(!match) {
+                    snprintf(
+                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                        "At argument near %d: Unknown long argument: '%s'.", ctx->argi, arg
+                    );
+                    return -1;
                 }
-            }
-            if(!match) {
-                snprintf(
-                    cp_parse_opt_err, CP_PARSE_ERR_LEN,
-                    "At argument near %d: Unknown long argument: '%s'.", ctx->argi, arg
-                );
-                return -1;
             }
         } else if(arg[0] == '-') {
             ++arg;
@@ -523,18 +425,25 @@ int cp_parseUntil(Cp_Ctx *ctx, uintmax_t subcommandc, const char **subcommandv) 
                         break;
                     }
                 }
+                if(!match) {
+                    snprintf(
+                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                        "At argument near %d: Unknown short argument in arg: '%s'.", ctx->argi, arg
+                    );
+                    return -1;
+                }
                 if(
                     arg[arg_amount] == '=' ||
                     arg[arg_amount] == ':'
                 ) {
+                    if(arg_amount > 1) {
+                        snprintf(
+                            cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                         "At argument near %d: Short opts can only have an argument if isolated.", ctx->argi
+                        );
+                        return -1;
+                    }
                     break;
-                }
-                if(!match) {
-                    snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
-                        "At argument near %d: Unknown short argument: '%s'.", j, arg
-                    );
-                    return -1;
                 }
             }
         } else {
