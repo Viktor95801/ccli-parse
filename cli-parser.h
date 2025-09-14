@@ -67,8 +67,8 @@ typedef struct {
     Cp_Opt_Kind kind;
     const char *name;
     char short_name;
-    const char *desc;
-    const char *long_desc;
+    char *short_desc;
+    void *user_data;
 } Cp_Opt;
 
 typedef struct Cp_Ctx {
@@ -81,7 +81,6 @@ typedef struct Cp_Ctx {
     char **argumentv;
     Cp_Opt *optv;
     const char *app_name;
-    void(*usage)(struct Cp_Ctx *self, FILE *file);
     uintmax_t optc;
     int argc;
     int argi; // internal index for where we are in argv
@@ -99,9 +98,6 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount);
 
 int cp_parseUntil(Cp_Ctx *ctx, uintmax_t subcommandc, const char **subcommandv);
 int cp_parse(Cp_Ctx *ctx);
-
-// Very basic `usage` function
-void cp_usage(Cp_Ctx *ctx, FILE *file);
 
 // internal usage
 bool cp__strHasPrefix(const char *str, const char *prefix);
@@ -153,8 +149,6 @@ Cp_Ctx *cp_newCtx(int argc, char *argv[], uintmax_t optc, Cp_Opt optv[], int arg
 
     ctx->argumentcap = argumentcap;
     ctx->argumentv = argumentv;
-
-    ctx->usage = cp_usage;
 
     return ctx;
 }
@@ -474,6 +468,13 @@ int cp_parseUntil(Cp_Ctx *ctx, uintmax_t subcommandc, const char **subcommandv) 
     for(; ctx->argi < ctx->argc; ++ctx->argi) {
         const char *arg = ctx->argv[ctx->argi];
         if(cp__streq(arg, "--")) {
+            if(ctx->argumentc+1 >= ctx->argumentcap) {
+                return ctx->argi;
+            }
+            for(; ctx->argi < ctx->argc && ctx->argumentc < ctx->argumentcap; ++ctx->argi) {
+                arg = ctx->argv[ctx->argi];
+                ctx->argumentv[ctx->argumentc++] = (char*)arg;
+            }
             return ctx->argi;
         } else {
             for(size_t j = 0; j < subcommandc; ++j) {
@@ -548,15 +549,6 @@ int cp_parseUntil(Cp_Ctx *ctx, uintmax_t subcommandc, const char **subcommandv) 
 
 int cp_parse(Cp_Ctx *ctx) {
     return cp_parseUntil(ctx, 0, NULL);
-}
-
-void cp_usage(Cp_Ctx *ctx, FILE *file) {
-    fprintf(file, "OPTIONS:\n");
-    for(int i = 0; i < ctx->optc; ++i) {
-        Cp_Opt opt = ctx->optv[i];
-        fprintf(file, "\t%s, %c : %s\n", 
-            opt.name, opt.short_name != 0 ? opt.short_name : '-', opt.desc);
-    }
 }
 
 #endif

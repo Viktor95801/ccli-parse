@@ -3,6 +3,32 @@
 
 #include <stdio.h>
 
+void usage(Cp_Ctx *ctx, FILE *file) {
+    int maxlen = 0;
+    for (int i = 0; i < ctx->optc; ++i) {
+        int len = strlen(ctx->optv[i].name);
+        if (ctx->optv[i].short_name != '\0') {
+            len += 2; // for ", X"
+        }
+        if (len > maxlen) maxlen = len;
+    }
+
+    printf("OPTIONS:\n");
+    for(int i = 0; i < ctx->optc; ++i) {
+        Cp_Opt opt = ctx->optv[i];
+        printf("  %s", opt.name);
+        if(opt.short_name != '\0') {
+            printf(", %c", opt.short_name);
+        }
+        int printed_len = (opt.short_name != '\0')
+            ? (int)strlen(opt.name) + 3  // "name, x"
+            : (int)strlen(opt.name);
+        int padding = maxlen - printed_len + 2;
+        printf("%-*s", padding, "\0");
+        printf(" : %s\n", opt.short_desc);
+    }
+}
+
 int main(int argc, char *argv[]) {
     bool help;
     char *file = NULL;
@@ -28,7 +54,7 @@ int main(int argc, char *argv[]) {
     }
     
     if(help) {
-        cp_usage(ctx, stdout);
+        usage(ctx, stdout);
         cp_freeCtx(ctx);
         return 0;
     }
