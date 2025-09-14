@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
         {&num, OPTK_NUMBER, "number", 'N', "Number to print."}
     };
     
-    char *argumentv[argc];
+    char **argumentv = alloca( argc * sizeof(char*));
     Cp_Ctx *ctx = cp_newCtx(argc, argv, sizeof(opts)/sizeof(*opts), opts, argc, argumentv);
     if(ctx == NULL) {
         return 1;
