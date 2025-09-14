@@ -21,7 +21,7 @@ else
 fi
 
 echo Running...
-shift; shift
+shift
 ./"$elf" "$@"
 if [ $? -eq 1 ]; then
     echo 
