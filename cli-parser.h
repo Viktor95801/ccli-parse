@@ -66,12 +66,14 @@ typedef struct {
     void *holder;
     Cp_Opt_Kind kind;
     const char *name;
-    char short_name;
+    const char short_name;
     char *short_desc;
     void *user_data;
 } Cp_Opt;
 
+#define CP_PARSE_ERR_LEN 1024
 typedef struct Cp_Ctx {
+    char err[CP_PARSE_ERR_LEN];
     char **argv;
     // Stores arguments such as file names in a compiler.
     // E.g.
@@ -91,8 +93,6 @@ typedef struct Cp_Ctx {
 Cp_Ctx *cp_newCtx(int argc, char *argv[], uintmax_t optc, Cp_Opt optv[], int argumentcap, char *argumentv[]);
 void cp_freeCtx(Cp_Ctx *ctx);
 
-#define CP_PARSE_ERR_LEN 1024
-extern char cp_parse_opt_err[CP_PARSE_ERR_LEN];
 // internal usage
 bool cp__parseLongOpt(Cp_Ctx *ctx, Cp_Opt opt);
 bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount);
@@ -158,7 +158,6 @@ void cp_freeCtx(Cp_Ctx *ctx) {
     free(ctx);
 }
 
-char cp_parse_opt_err[CP_PARSE_ERR_LEN];
 bool cp__parseLongOpt(Cp_Ctx *ctx, Cp_Opt opt) {
     const char *arg = ctx->argv[ctx->argi];
     if(cp__strHasPrefix(arg, "--")) {
@@ -168,7 +167,7 @@ bool cp__parseLongOpt(Cp_Ctx *ctx, Cp_Opt opt) {
         case OPTK_BOOL: {
             if(strlen(opt.name) != strlen(arg)) {
                 snprintf(
-                    cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                    ctx->err, CP_PARSE_ERR_LEN,
                     "At argument near %d: Argument of type `bool` takes no argument.", ctx->argi
                 );
                 return false;
@@ -183,7 +182,7 @@ bool cp__parseLongOpt(Cp_Ctx *ctx, Cp_Opt opt) {
                 // the value is on the next argument
                 if((ctx->argi)+1 >= ctx->argc) {
                     snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                        ctx->err, CP_PARSE_ERR_LEN,
                         "At argument near %d: Expected argument but got nothing.", ctx->argi
                     );
                     return false;
@@ -196,7 +195,7 @@ bool cp__parseLongOpt(Cp_Ctx *ctx, Cp_Opt opt) {
             if((assign = strchr(arg, '=')) == NULL) {
                 if((assign = strchr(arg, ':')) == NULL) {
                     snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                        ctx->err, CP_PARSE_ERR_LEN,
                         "At argument near %d: Expected either '=', ':' or ' ' to set value. E.g. `flag=this flag:that`.", ctx->argi
                     );
                     return false;
@@ -212,7 +211,7 @@ bool cp__parseLongOpt(Cp_Ctx *ctx, Cp_Opt opt) {
                 // the value is on the next argument
                 if((ctx->argi)+1 >= ctx->argc) {
                     snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                        ctx->err, CP_PARSE_ERR_LEN,
                         "At argument near %d: Expected argument but got nothing.", ctx->argi
                     );
                     return false;
@@ -221,7 +220,7 @@ bool cp__parseLongOpt(Cp_Ctx *ctx, Cp_Opt opt) {
                 double value;
                 if(sscanf(arg, "%lf", &value) != 1) {
                     snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                        ctx->err, CP_PARSE_ERR_LEN,
                         "At argument near %d: Expected a number literal.", ctx->argi
                     );
                     return false;
@@ -233,7 +232,7 @@ bool cp__parseLongOpt(Cp_Ctx *ctx, Cp_Opt opt) {
             if((assign = strchr(arg, '=')) == NULL) {
                 if((assign = strchr(arg, ':')) == NULL) {
                     snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                        ctx->err, CP_PARSE_ERR_LEN,
                         "At argument near %d: Expected either '=', ':' or ' ' to set value. E.g. `flag=this flag:that`.", ctx->argi
                     );
                     return false;
@@ -243,7 +242,7 @@ bool cp__parseLongOpt(Cp_Ctx *ctx, Cp_Opt opt) {
             double value;
             if(sscanf(assign, "%lf", &value) != 1) {
                 snprintf(
-                    cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                    ctx->err, CP_PARSE_ERR_LEN,
                     "At argument near %d: Expected a number literal.", ctx->argi
                 );
                 return false;
@@ -251,7 +250,7 @@ bool cp__parseLongOpt(Cp_Ctx *ctx, Cp_Opt opt) {
             *(double*)(opt.holder) = value;
         } break;
         default: {
-            strncpy(cp_parse_opt_err, "Unknown option kind.", CP_PARSE_ERR_LEN);
+            strncpy(ctx->err, "Unknown option kind.", CP_PARSE_ERR_LEN);
             return false; // in theory, unreachable
         } break;
     }
@@ -268,7 +267,7 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
         case OPTK_BOOL: {
             if(arg_amount < arg_len && (arg[arg_amount] == '=' || arg[arg_amount] == ':')) {
                 snprintf(
-                    cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                    ctx->err, CP_PARSE_ERR_LEN,
                     "At argument near %d: Argument of type `bool` takes no argument.", ctx->argi
                 );
                 return false;
@@ -278,7 +277,7 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
         case OPTK_STRING: {
             if(arg_amount > 1) {
                 snprintf(
-                    cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                    ctx->err, CP_PARSE_ERR_LEN,
                     "At argument near %d: Short opts can only have an argument if isolated.", ctx->argi
                 );
                 return false;
@@ -287,7 +286,7 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
                 // the value is on the next argument
                 if(ctx->argi+1 >= ctx->argc) {
                     snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                        ctx->err, CP_PARSE_ERR_LEN,
                         "At argument near %d: Expected argument but got nothing.", ctx->argi
                     );
                     return false;
@@ -300,7 +299,7 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
             if((assign = strchr(arg, '=')) == NULL) {
                 if((assign = strchr(arg, ':')) == NULL) {
                     snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                        ctx->err, CP_PARSE_ERR_LEN,
                         "At argument near %d: Expected either '=', ':' or ' ' to set value. E.g. `flag=this flag:that`.", ctx->argi
                     );
                     return false;
@@ -313,7 +312,7 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
         case OPTK_NUMBER: {
             if(arg_amount > 1) {
                 snprintf(
-                    cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                    ctx->err, CP_PARSE_ERR_LEN,
                     "At argument near %d: Short opts can only have an argument if isolated.", ctx->argi
                 );
                 return false;
@@ -322,7 +321,7 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
                 // the value is on the next argument
                 if(ctx->argi+1 >= ctx->argc) {
                     snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                        ctx->err, CP_PARSE_ERR_LEN,
                         "At argument near %d: Expected argument but got nothing.", ctx->argi
                     );
                     return false;
@@ -331,7 +330,7 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
                 double value;
                 if(sscanf(arg, "%lf", &value) != 1) {
                     snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                        ctx->err, CP_PARSE_ERR_LEN,
                         "At argument near %d: Expected a number literal.", ctx->argi
                     );
                     return false;
@@ -343,7 +342,7 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
             if((assign = strchr(arg, '=')) == NULL) {
                 if((assign = strchr(arg, ':')) == NULL) {
                     snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                        ctx->err, CP_PARSE_ERR_LEN,
                         "At argument near %d: Expected either '=', ':' or ' ' to set value. E.g. `flag=this flag:that`.", ctx->argi
                     );
                     return false;
@@ -353,7 +352,7 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
             double value;
             if(sscanf(assign, "%lf", &value) != 1) {
                 snprintf(
-                    cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                    ctx->err, CP_PARSE_ERR_LEN,
                     "At argument near %d: Expected a number literal.", ctx->argi
                 );
                 return false;
@@ -362,7 +361,7 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
             return true;
         } break;
         default: {
-            strncpy(cp_parse_opt_err, "Internal: Unknown option kind.", CP_PARSE_ERR_LEN);
+            strncpy(ctx->err, "Internal: Unknown option kind.", CP_PARSE_ERR_LEN);
             return false; // in theory, unreachable
         } break;
     }
@@ -400,7 +399,7 @@ int cp_parseUntil(Cp_Ctx *ctx, uintmax_t subcommandc, const char *subcommandv[])
                         int name_len = strlen(ctx->optv[j].name);
                         if(arg[name_len]!=0 && arg[name_len]!=':' && arg[name_len]!='=') {
                             snprintf(
-                                cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                                ctx->err, CP_PARSE_ERR_LEN,
                                 "At argument near %d: Unknown long argument: '%s'.", ctx->argi, arg
                             );
                             return -1;
@@ -416,7 +415,7 @@ int cp_parseUntil(Cp_Ctx *ctx, uintmax_t subcommandc, const char *subcommandv[])
                 }
                 if(!match) {
                     snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                        ctx->err, CP_PARSE_ERR_LEN,
                         "At argument near %d: Unknown long argument: '%s'.", ctx->argi, arg
                     );
                     return -1;
@@ -442,7 +441,7 @@ int cp_parseUntil(Cp_Ctx *ctx, uintmax_t subcommandc, const char *subcommandv[])
                 }
                 if(!match) {
                     snprintf(
-                        cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                        ctx->err, CP_PARSE_ERR_LEN,
                         "At argument near %d: Unknown short argument in arg: '%s'.", ctx->argi, arg
                     );
                     return -1;
@@ -453,7 +452,7 @@ int cp_parseUntil(Cp_Ctx *ctx, uintmax_t subcommandc, const char *subcommandv[])
                 ) {
                     if(arg_amount > 1) {
                         snprintf(
-                            cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                            ctx->err, CP_PARSE_ERR_LEN,
                          "At argument near %d: Short opts can only have an argument if isolated.", ctx->argi
                         );
                         return -1;

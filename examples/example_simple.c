@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     }
     
     if(cp_parse(ctx) == -1) {
-        printf("ERROR: %s\n", cp_parse_opt_err);
+        printf("ERROR: %s\n", ctx->err);
         cp_freeCtx(ctx);
         return 1;
     }

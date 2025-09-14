@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     int stopped = 0;
     const char *scmd_main[] = {scmd_hi_name, scmd_say_name};
     if((stopped = cp_parseUntil(ctx, 2, scmd_main)) == -1) {
-        printf("ERROR: %s\n", cp_parse_opt_err);
+        printf("ERROR: %s\n", ctx->err);
         cp_freeCtx(ctx);
         return 1;
     }
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
         }
 
         if(cp_parse(ctx) == -1) {
-            printf("ERROR: %s\n", cp_parse_opt_err);
+            printf("ERROR: %s\n", ctx->err);
             cp_freeCtx(ctx);
             return -1;
         }
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
         }
 
         if(cp_parse(ctx) == -1) {
-            printf("ERROR: %s\n", cp_parse_opt_err);
+            printf("ERROR: %s\n", ctx->err);
             cp_freeCtx(ctx);
             return -1;
         }
