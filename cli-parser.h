@@ -172,7 +172,7 @@ bool cp__parseLongOpt(Cp_Ctx *ctx, Cp_Opt opt) {
                 );
                 return false;
             }
-            *(bool*)(opt.holder) = 1;
+            *(bool*)(opt.holder) = !*(bool*)(opt.holder);
         } break;
         case OPTK_STRING: {
             int name_len = strlen(opt.name);
@@ -272,7 +272,7 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
                 );
                 return false;
             }
-            *(bool*)(opt.holder) = 1;
+            *(bool*)(opt.holder) = !*(bool*)(opt.holder);
         } break;
         case OPTK_STRING: {
             if(arg_amount > 1) {
