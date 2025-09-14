@@ -48,7 +48,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define CP_OPTK_NUMBER_INVALID (0.0/0.0)
+#define CP_NUMBER_INVALID (0.0/0.0)
+#define CpNumberIsValid(number) ((number) == (number))
 
 // internal usage
 #define cp__streq(str1, str2) (strcmp(str1, str2) == 0)

@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     bool test;
     char *file = NULL;
     char *name = NULL;
-    double numb = CP_OPTK_NUMBER_INVALID;
+    double numb = CP_NUMBER_INVALID;
     Cp_Opt opts[] = {
         {&help, OPTK_BOOL, "help", 'h', "Prints this help message. Upon doing so, exits the program successfully."},
         {&test, OPTK_BOOL, "test", 't', "Sick test."},
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     if(test) {
         printf("This is a very sick test\n");
     }
-    if(numb == numb) {
+    if(CpNumberIsValid(numb)) {
         printf("Number: %lf\n", numb);
     }
     if(help) {
