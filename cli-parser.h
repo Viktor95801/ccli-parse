@@ -161,6 +161,9 @@ void cp_freeCtx(Cp_Ctx *ctx) {
 char cp_parse_opt_err[CP_PARSE_ERR_LEN];
 bool cp__parseLongOpt(Cp_Ctx *ctx, Cp_Opt opt) {
     const char *arg = ctx->argv[ctx->argi];
+    if(cp__strHasPrefix(arg, "--")) {
+        arg+=2;
+    }
     switch(opt.kind) {
         case OPTK_BOOL: {
             if(strlen(opt.name) != strlen(arg)) {
@@ -175,6 +178,7 @@ bool cp__parseLongOpt(Cp_Ctx *ctx, Cp_Opt opt) {
         case OPTK_STRING: {
             int name_len = strlen(opt.name);
             int arg_len = strlen(arg);
+            
             if(name_len == arg_len) {
                 // the value is on the next argument
                 if((ctx->argi)+1 >= ctx->argc) {
@@ -256,6 +260,9 @@ bool cp__parseLongOpt(Cp_Ctx *ctx, Cp_Opt opt) {
 }
 bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
     const char *arg = ctx->argv[ctx->argi];
+    if(arg[0] == '-') {
+        ++arg;
+    }
     int arg_len = strlen(arg);
     switch(opt.kind) {
         case OPTK_BOOL: {
@@ -309,7 +316,7 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
                     cp_parse_opt_err, CP_PARSE_ERR_LEN,
                     "At argument near %d: Short opts can only have an argument if isolated.", ctx->argi
                 );
-                return -1;
+                return false;
             }
             if(arg_amount >= arg_len) {
                 // the value is on the next argument
@@ -318,7 +325,7 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
                         cp_parse_opt_err, CP_PARSE_ERR_LEN,
                         "At argument near %d: Expected argument but got nothing.", ctx->argi
                     );
-                    return -1;
+                    return false;
                 }
                 arg = ctx->argv[++ctx->argi];
                 double value;
@@ -327,7 +334,7 @@ bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount) {
                         cp_parse_opt_err, CP_PARSE_ERR_LEN,
                         "At argument near %d: Expected a number literal.", ctx->argi
                     );
-                    return -1;
+                    return false;
                 }
                 *(double*)(opt.holder) = value;
                 return true;
@@ -390,6 +397,14 @@ int cp_parseUntil(Cp_Ctx *ctx, uintmax_t subcommandc, const char *subcommandv[])
                 bool match = false;
                 for(size_t j = 0; j < ctx->optc; ++j) {
                     if(cp__strHasPrefix(arg, ctx->optv[j].name)) {
+                        int name_len = strlen(ctx->optv[j].name);
+                        if(arg[name_len]!=0 && arg[name_len]!=':' && arg[name_len]!='=') {
+                            snprintf(
+                                cp_parse_opt_err, CP_PARSE_ERR_LEN,
+                                "At argument near %d: Unknown long argument: '%s'.", ctx->argi, arg
+                            );
+                            return -1;
+                        }
                         match = true;
                         if(!cp__parseLongOpt(ctx, ctx->optv[j])) {
                             return -1;
