@@ -1,5 +1,5 @@
 /*
-The `cli-parser.h` file is licensed under the following 2 licenses:
+The `cli-parser.h` file is licensed under the following 2 licenses, pick whichever fits the best for your use case:
   1. The 10DAL license. 
     ===~----------------------------------------------~===
 ----| 10DAL - The "10 Dollars A License" license. (v2.1) |----
