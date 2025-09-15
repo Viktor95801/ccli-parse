@@ -1,4 +1,66 @@
 /*
+The `cli-parser.h` file is licensed under the following 2 licenses:
+  1. The 10DAL license. 
+    ===~----------------------------------------------~===
+----| 10DAL - The "10 Dollars A License" license. (v2.1) |----
+    ===~----------------------------------------------~===
+Copyright (c) 2025 Viktor Hugo Caetano M. Goulart
+
+Definitions
+-----------
+1. "The Software" means any version of this software and associated files.
+2. "Military Purposes" means direct and indirect use of the The Software in
+   the planning, execution or support of military operations.
+3. "Harmful Intent" means deliberate use of The Software with the aim of causing 
+   significant physical, moral or mental harm to people or property.
+
+Permission
+----------
+The Software is licensed under the 10DAL license, which is
+subject to the conditions below, permission is granted, free of charge, to any
+person obtaining a copy of the The Software, to - but not limited to, even if you are
+Richard M. StallMan - use the The Software, to modify the The Software, to distribute the
+The Software, to sell the The Software, and/or to relicense the The Software 
+
+Restrictions and Condition
+--------------------------
+1. Upon making use of the The Software for Military Purposes or with Harmful Intent,
+   you are revoked the title of being a good person and you are encouraged to:
+     (a) donate the equivalent of USD 10 (ten US dollars) to a local community 
+         organization or charity, 
+     (b) include in any redistribution a short statement noting that a donation
+         was made, specifying the recipient and date.
+
+Termination
+-----------
+Failure to comply with the condition in the previous section constitutes a
+material breach of this license and automatically terminates the rights
+granted to you under this license. Termination does not affect rights that
+have already vested prior to the breach, except to the extent required by
+applicable law.
+
+Optional Good-Practice Suggestions to Become a Better Human (non-binding)
+-------------------------------------------------------------------------
+1. Be kind to people. Donate money, give gifts, help them.
+2. Sign for volunteer work and/or donate 10 dollars monthly to your
+   local charity.
+3. Do NOT waste anything that comes from natural non-renewable resources.
+4. Be tolerant. Everything in humanity, including the device, be it physical or
+   digital, that you are using to read this right now, came from cooperation.
+5. Do NOT insult other people without a prior reason to it.
+6. Study upon topics you consider yourself ignorant about.
+
+Warranty Disclaimer
+-------------------
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE. 
+
+  2. The RABRMS license
     Copyright © 2025 Viktor Hugo Caetano M. Goulart
 
     This software is licensed under the "Revised Anyone But Richard M. Stallman" (RABRMS) license, described below.
