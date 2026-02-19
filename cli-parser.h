@@ -111,6 +111,11 @@ typedef struct Cp_Ctx {
 Cp_Ctx *cp_newCtx(int argc, char *argv[], uintmax_t optc, Cp_Opt optv[], int argumentcap, char *argumentv[]);
 void cp_freeCtx(Cp_Ctx *ctx);
 
+// Default "help" function. Is not called by the library and is only implemented for utility.
+// Define "CLI_PARSER_CUSTOM_USAGE" to disable "cp_usage"'s implementation and implement a usage function yourself.
+// Check "cp_usage"'s implementation for an example on how to implement a usage function.
+void cp_usage(Cp_Ctx *ctx, FILE *file);
+
 // internal usage
 bool cp__parseLongOpt(Cp_Ctx *ctx, Cp_Opt opt);
 bool cp__parseShortOpt(Cp_Ctx *ctx, Cp_Opt opt, int arg_amount);
@@ -491,6 +496,36 @@ int cp_parseUntil(Cp_Ctx *ctx, uintmax_t subcommandc, const char *subcommandv[])
 int cp_parse(Cp_Ctx *ctx) {
     return cp_parseUntil(ctx, 0, NULL);
 }
+
+#ifndef CLI_PARSER_CUSTOM_USAGE
+
+void cp_usage(Cp_Ctx *ctx, FILE *file) {
+    int maxlen = 0;
+    for (int i = 0; i < ctx->optc; ++i) {
+        int len = strlen(ctx->optv[i].name);
+        if (ctx->optv[i].short_name != '\0') {
+            len += 2; // for ", X"
+        }
+        if (len > maxlen) maxlen = len;
+    }
+
+    printf("OPTIONS:\n");
+    for(int i = 0; i < ctx->optc; ++i) {
+        Cp_Opt opt = ctx->optv[i];
+        printf("  %s", opt.name);
+        if(opt.short_name != '\0') {
+            printf(", %c", opt.short_name);
+        }
+        int printed_len = (opt.short_name != '\0')
+            ? (int)strlen(opt.name) + 3  // "name, x"
+            : (int)strlen(opt.name);
+        int padding = maxlen - printed_len + 2;
+        printf("%-*s", padding, "\0");
+        printf(" : %s\n", opt.short_desc);
+    }
+}
+
+#endif
 
 #endif
 
