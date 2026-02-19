@@ -1,44 +1,34 @@
 /*
-The `cli-parser.h` file is licensed under the following 2 licenses, pick whichever fits the best for your use case:
-  1. The 10DAL license. 
-    ===~----------------------------------------------~===
-----| 10DAL - The "10 Dollars A License" license. (v2.1) |----
-    ===~----------------------------------------------~===
-Copyright (c) 2025 Viktor Hugo Caetano M. Goulart
 
+    ===~----------------------------------------------~===
+----| 10DAL - The "10 Dollars A License" license. (v4.1) |----
+    ===~----------------------------------------------~===
+Copyright (c) 2026 Viktor Hugo Caetano M. Goulart
+_______
+Summary
+-------
+Do whatever you want, be a nice person.
+___________
 Definitions
 -----------
 1. "The Software" means any version of this software and associated files.
-2. "Military Purposes" means direct and indirect use of the The Software in
+2. "Military Purposes" means direct use of the The Software in
    the planning, execution or support of military operations.
 3. "Harmful Intent" means deliberate use of The Software with the aim of causing 
-   significant physical, moral or mental harm to people or property.
-
+   significant physical, moral or mental harm* to people or property.
+   * Examples of "harm" include: harassment, anything that may hurt a person
+     physically - including torture, human trafficking, genocide,
+     creation of weapons, etc.
+__________
 Permission
 ----------
-The Software is licensed under the 10DAL license, which is
+The The Software is licensed under the 10DAL license, which is
 subject to the conditions below, permission is granted, free of charge, to any
-person obtaining a copy of the The Software, to - but not limited to, even if you are
+person obtaining a copy of the The Software, to - but not limited to, except if you are
 Richard M. StallMan - use the The Software, to modify the The Software, to distribute the
-The Software, to sell the The Software, and/or to relicense the The Software 
-
-Restrictions and Condition
---------------------------
-1. Upon making use of the The Software for Military Purposes or with Harmful Intent,
-   you are revoked the title of being a good person and you are encouraged to:
-     (a) donate the equivalent of USD 10 (ten US dollars) to a local community 
-         organization or charity, 
-     (b) include in any redistribution a short statement noting that a donation
-         was made, specifying the recipient and date.
-
-Termination
------------
-Failure to comply with the condition in the previous section constitutes a
-material breach of this license and automatically terminates the rights
-granted to you under this license. Termination does not affect rights that
-have already vested prior to the breach, except to the extent required by
-applicable law.
-
+The Software, to sell the The Software, and/or to relicense the The Software.
+However, if you are Richard M. StallMan, your rights of using the The Software are immediately revoked.
+_________________________________________________________________________
 Optional Good-Practice Suggestions to Become a Better Human (non-binding)
 -------------------------------------------------------------------------
 1. Be kind to people. Donate money, give gifts, help them.
@@ -49,7 +39,10 @@ Optional Good-Practice Suggestions to Become a Better Human (non-binding)
    digital, that you are using to read this right now, came from cooperation.
 5. Do NOT insult other people without a prior reason to it.
 6. Study upon topics you consider yourself ignorant about.
-
+7. If you use the The Software with Harmful Intent or with Military Purposes,
+   you are specially encouraged to make donations and volunteer for people 
+   in your area.
+___________________
 Warranty Disclaimer
 -------------------
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -58,45 +51,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE. 
-
-  2. The RABRMS license
-    Copyright © 2025 Viktor Hugo Caetano M. Goulart
-
-    This software is licensed under the "Revised Anyone But Richard M. Stallman" (RABRMS) license, described below.
-
-    ===--------------------------------------------------===
-    | The "Revised Anyone But Richard M. Stallman" license |
-    ===--------------------------------------------------===
-
-    Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-    Conditions
-    ----------
-
-    1. Redistributions of source code must retain the above copyright notice, this list of conditions, 
-        and the following disclaimer.
-
-    2. Redistributions in binary form must reproduce the above copyright notice, 
-        this list of conditions, and the following disclaimer in the documentation 
-        and/or other materials provided with the distribution.
-
-    3. Neither the name of the copyright holder nor the names of its contributors may be used to 
-        endorse or promote products derived from this software without specific prior written permission.
-
-    4. You can relicense under any license that meets the first 3 conditions and isn't copylefted, 
-        as long as you aren't Richard M. Stallman.
-
-    5. Richard M. Stallman (the guy behind GNU, etc.) may not make use of, redistribute, 
-        nor relicense this program or any of its derivatives.
-
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
-    IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
-    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-    WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
-    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+THE SOFTWARE.
 */
 
 #ifndef CLI_PARSER_H
